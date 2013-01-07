@@ -13,12 +13,22 @@
 #
 ELF="$0.elf"
 if [ ! -e "$ELF" ]; then
-  echo 'PonySu 0.1'
+  echo 'PonySu 0.2'
   echo
   echo 'Usage:'
   echo '  Create a symbolic link to ponysu, where the name'
-  echo '  of the exexecutable + .elf results in the path'
+  echo '  of the executable + .elf results in the path'
   echo '  to the elf file you wish to run as root.'
+  echo
+  echo 'For example, if you wish to run /usr/bin/app.elf'
+  echo 'as root. Create a symbolic link:'
+  echo
+  echo '  ln -s /usr/bin/ponysu /usr/bin/app'
+  echo
+  echo 'Then when running /usr/bin/app, ponysu will kick in'
+  echo 'and run /usr/bin/app.elf as root by trying to run'
+  echo 'the application with: pkexec, gksudo, gksu, kdesudo'
+  echo 'and kdesu, in that order.'
   echo
   exit 1
 fi
