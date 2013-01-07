@@ -2,7 +2,7 @@
 #
 ####################################################
 #                                                  #
-# PonySu 0.1                                       #
+# PonySu 0.3                                       #
 #                                                  #
 # A script for running a GUI program as root       #
 #                                                  #
@@ -12,8 +12,9 @@
 ####################################################
 #
 ELF="$0.elf"
+ARGS="$@"
 if [ ! -e "$ELF" ]; then
-  echo 'PonySu 0.2'
+  echo 'PonySu 0.3'
   echo
   echo 'Usage:'
   echo '  Create a symbolic link to ponysu, where the name'
@@ -33,23 +34,23 @@ if [ ! -e "$ELF" ]; then
   exit 1
 fi
 if [ -e /usr/bin/pkexec ]; then
-  pkexec $ELF && exit 0
+  pkexec "$ELF" "$ARGS" && exit 0
 fi
 if [ -z "$KDE_FULL_SESSION" ]; then
   if [ -e /usr/bin/gksudo ]; then
-      gksudo $ELF && exit 0
+      gksudo "$ELF" "$ARGS" && exit 0
   fi
   if [ -e /usr/bin/gksu ]; then
-      gksu $ELF && exit 0
+      gksu "$ELF" "$ARGS" && exit 0
   fi
   echo 'Could not use pkexec, gksudo or gksu'
-  $ELF && exit 0 || exit 1
+  "$ELF" "$ARGS" && exit 0 || exit 1
 fi  
 if [ -e /usr/bin/kdesudo ]; then
-  kdesudo $ELF && exit 0
+  kdesudo "$ELF" "$ARGS" && exit 0
 fi
 if [ -e /usr/bin/kdesu ]; then
-  kdesu $ELF && exit 0
+  kdesu "$ELF" "$ARGS" && exit 0
 fi
 echo 'Could not use kdesudo or kdesu'
-$ELF
+"$ELF" "$ARGS"
