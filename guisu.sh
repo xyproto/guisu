@@ -53,14 +53,14 @@ fi
 
 # --- Start agents if they aren't running ---
 
-if [ terminal == yes ]; then
+if [ $terminal == yes ]; then
   # Start pkttyagent if it's not running
   if [ -x /usr/bin/pkttyagent ]; then
     pgrep pkttyagent || pkttyagent &
     hasagent=yes
   fi
 else
-  if [ kde == yes ]; then
+  if [ $kde == yes ]; then
     # Start the KDE polkit authentication agent if it's not running
     if [ -x /usr/lib/kde4/libexec/polkit-kde-authentication-agent-1 ]; then
       pgrep polkit-kde-authentication-agent-1 || /usr/lib/kde4/libexec/polkit-kde-authentication-agent-1 &
@@ -75,7 +75,7 @@ else
   fi
 fi
 
-if [ hasagent == yes ]; then
+if [ $hasagent == yes ]; then
   if [ -x /usr/bin/pkexec ]; then
     pkexec "$ELF" "$ARGS" && exit 0
   fi
@@ -83,14 +83,14 @@ fi
 
 # --- Fall back on the old ways ---
 
-if [ kde == no ]; then
+if [ $kde == no ]; then
   if [ -x /usr/bin/gksudo ]; then
       gksudo "$ELF" "$ARGS" && exit 0
   fi
   if [ -x /usr/bin/gksu ]; then
       gksu "$ELF" "$ARGS" && exit 0
   fi
-  if [ terminal == yes ]; then
+  if [ $terminal == yes ]; then
     echo 'Could not use pkexec, gksudo or gksu'
   fi
 else
