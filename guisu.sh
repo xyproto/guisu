@@ -38,17 +38,15 @@ fi
 # --- Figure out what the current situation is ---
 
 hasagent=no
+terminal=no
+kde=yes
 
 if tty -s; then
   terminal=yes
-else
-  terminal=no
 fi
 
 if [ -z "$KDE_FULL_SESSION" ]; then
   kde=no
-else
-  kde=yes
 fi
 
 # --- Start agents if they aren't running ---
