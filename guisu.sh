@@ -60,7 +60,7 @@ if [ terminal == yes ]; then
     hasagent=yes
   fi
 else
-  if [ kde == yes]; then
+  if [ kde == yes ]; then
     # Start the KDE polkit authentication agent if it's not running
     if [ -x /usr/lib/kde4/libexec/polkit-kde-authentication-agent-1 ]; then
       pgrep polkit-kde-authentication-agent-1 || /usr/lib/kde4/libexec/polkit-kde-authentication-agent-1 &
