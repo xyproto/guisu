@@ -29,79 +29,61 @@ if [ ! -e "$ELF" ]; then
   echo
   echo 'Then when running /usr/bin/app, guisu will kick in'
   echo 'and run /usr/bin/app.elf as root by trying to run'
-  echo 'the application with: pkexec, gksudo, gksu, kdesudo'
-  echo 'and kdesu, in that order.'
+  echo 'the application with: pkexec and gksu in that'
+  echo 'order, and falls back to terminal, if no GUI found.'
   echo
   exit 1
 fi
 
-# --- Figure out what the current situation is ---
+# --- Start an agent if it isn't running ---
 
 hasagent=no
-terminal=no
-kde=yes
 
-if tty -s; then
-  terminal=yes
+if pgrep ^cinnamon &> /dev/null || \
+   pgrep ^gnome-shell &> /dev/null || \
+   pgrep ^lxpolkit &> /dev/null || \
+   pgrep ^polkit-gnome &> /dev/null || \
+   pgrep ^polkit-kde &> /dev/null; then
+  # A polkit authentication agent is already running
+  hasagent=yes
+elif [ -x /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 ]; then
+  # Start the GNOME polkit authentication agent
+  /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 & sleep 0.5
+  hasagent=yes
+elif [ -x /usr/lib/lxpolkit/lxpolkit ]; then
+  # Start the LXPolkit authentication agent
+  /usr/lib/lxpolkit/lxpolkit & sleep 0.5
+  hasagent=yes
 fi
 
-if [ -z "$KDE_FULL_SESSION" ]; then
-  kde=no
-fi
-
-# --- Start agents if they aren't running ---
-
-if [ $terminal == yes ]; then
-  # Start pkttyagent if it's not running
-  if [ -x /usr/bin/pkttyagent ]; then
-    pgrep pkttyagent || pkttyagent &
-    hasagent=yes
-  fi
-else
-  if [ $kde == yes ]; then
-    # Start the KDE polkit authentication agent if it's not running
-    if [ -x /usr/lib/kde4/libexec/polkit-kde-authentication-agent-1 ]; then
-      pgrep polkit-kde-authentication-agent-1 || /usr/lib/kde4/libexec/polkit-kde-authentication-agent-1 &
-      hasagent=yes
-    fi
-  else
-    # Start the GNOME polkit authentication agent if it's not running
-    if [ -x /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 ]; then
-      pgrep polkit-gnome-authentication-agent-1 || /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
-      hasagent=yes
-    fi
-  fi
-fi
+# --- Run pkexec with graphical agent ---
 
 if [ $hasagent == yes ]; then
   if [ -x /usr/bin/pkexec ]; then
-    pkexec "$ELF" "$ARGS" && exit 0
+    pkexec --disable-internal-agent "$ELF" "$ARGS"
+    exit 0
   fi
 fi
 
 # --- Fall back on the old ways ---
 
-if [ $kde == no ]; then
-  if [ -x /usr/bin/gksudo ]; then
-      gksudo "$ELF" "$ARGS" && exit 0
+if [ -x /usr/bin/gksu ]; then
+    gksu "$ELF" "$ARGS"
+    exit 0
+fi
+
+# --- Fall back to terminal ---
+
+if tty -s; then
+  if [ -x /usr/bin/pkexec ]; then
+    pkexec "$ELF" "$ARGS"
+    exit 0
   fi
-  if [ -x /usr/bin/gksu ]; then
-      gksu "$ELF" "$ARGS" && exit 0
+  if [ -x /usr/bin/sudo ]; then
+    sudo "$ELF" "$ARGS"
+    exit 0
   fi
-  if [ $terminal == yes ]; then
-    echo 'Could not use pkexec, gksudo or gksu'
-  fi
-else
-  if [ -x /usr/bin/kdesudo ]; then
-    kdesudo "$ELF" "$ARGS" && exit 0
-  fi
-  if [ -e /usr/bin/kdesu ]; then
-    kdesu "$ELF" "$ARGS" && exit 0
-  fi
-  if [ terminal == yes ]; then
-    echo 'Could not use kdesudo or kdesu'
-  fi
-fi  
+fi
 
 # --- Last resort ---
 
