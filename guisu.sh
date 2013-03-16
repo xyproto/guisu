@@ -2,7 +2,7 @@
 
 ####################################################
 #                                                  #
-# GuiSu 0.4                                        #
+# GuiSu 0.5                                        #
 #                                                  #
 # Script for running GUI programs as root          #
 #                                                  #
@@ -19,7 +19,7 @@ ELF="$0.elf"
 ARGS="$@"
 
 if [ ! -e "$ELF" ]; then
-  echo 'GuiSu 0.4'
+  echo 'GuiSu 0.5'
   echo
   echo 'Usage:'
   echo '  Create a symbolic link to guisu, where the name'
@@ -64,24 +64,28 @@ fi
 
 if [ $hasagent == yes ]; then
   if [ -x /usr/bin/pkexec ]; then
-    pkexec --disable-internal-agent "$ELF" "$ARGS" && exit 0
+    pkexec --disable-internal-agent "$ELF" "$ARGS"
+    exit 0
   fi
 fi
 
 # --- Fall back on the old ways ---
 
 if [ -x /usr/bin/gksu ]; then
-    gksu "$ELF" "$ARGS" && exit 0
+    gksu "$ELF" "$ARGS"
+    exit 0
 fi
 
 # --- Fall back to terminal ---
 
 if tty -s; then
   if [ -x /usr/bin/pkexec ]; then
-    pkexec "$ELF" "$ARGS" && exit 0
+    pkexec "$ELF" "$ARGS"
+    exit 0
   fi
   if [ -x /usr/bin/sudo ]; then
-    sudo "$ELF" "$ARGS" && exit 0
+    sudo "$ELF" "$ARGS"
+    exit 0
   fi
 fi
 
