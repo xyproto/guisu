@@ -4,10 +4,14 @@
 #                                                  #
 # GuiSu 0.4                                        #
 #                                                  #
-# A script for running a GUI program as root       #
+# Script for running GUI programs as root          #
 #                                                  #
-# Alexander Rødseth, 2013                          #
-# MIT license                                      #
+# Alexander Rødseth                                #
+# György Balló                                     #
+#                                                  #
+# 16-03-2013                                       #
+#                                                  #
+# MIT licensed                                     #
 #                                                  #
 ####################################################
 
